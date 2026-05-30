@@ -1,9 +1,9 @@
-/* =====================================================
-   KRISTOFFER IAN SIOSON — Portfolio Stylesheet
+/* 
+   Portfolio Stylesheet
    File: css/style.css
-   ===================================================== */
+    */
 
-/* ─── 1. CSS Custom Properties (Design Tokens) ──────── */
+/* CSS Custom Properties  */
 :root {
   /* Colors */
   --color-bg:        #050a0e;
@@ -48,7 +48,7 @@
   --transition-slow:   all 0.4s ease;
 }
 
-/* ─── 2. Reset & Base ───────────────────────────────── */
+/* Reset & Base */
 *,
 *::before,
 *::after {
@@ -76,12 +76,12 @@ a        { color: inherit; }
 ul       { list-style: none; }
 button   { cursor: pointer; font-family: inherit; }
 
-/* ─── 3. Custom Scrollbar ───────────────────────────── */
+/* Custom Scrollbar  */
 ::-webkit-scrollbar          { width: 6px; }
 ::-webkit-scrollbar-track    { background: var(--color-bg); }
 ::-webkit-scrollbar-thumb    { background: var(--color-green2); border-radius: 3px; }
 
-/* ─── 4. Custom Cursor ──────────────────────────────── */
+/* Custom Cursor */
 #cursor {
   position: fixed;
   top: 0; left: 0;
@@ -112,7 +112,7 @@ body:has(button:hover) #cursor {
   border-color: var(--color-cyan);
 }
 
-/* ─── 5. Noise Texture Overlay ──────────────────────── */
+/* Noise Texture Overlay */
 body::before {
   content: '';
   position: fixed;
@@ -123,7 +123,7 @@ body::before {
   pointer-events: none;
 }
 
-/* ─── 6. Navigation ─────────────────────────────────── */
+/*  Navigation */
 #navbar {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -202,7 +202,7 @@ body::before {
 .nav-toggle.open span:nth-child(2) { opacity: 0; }
 .nav-toggle.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
 
-/* ─── 7. Shared Section Utilities ───────────────────── */
+/* Shared Section Utilities */
 section { position: relative; z-index: 1; }
 
 .section-inner {
@@ -245,7 +245,7 @@ section { position: relative; z-index: 1; }
   margin: 0 var(--space-lg);
 }
 
-/* ─── 8. Buttons ────────────────────────────────────── */
+/* Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -285,7 +285,7 @@ section { position: relative; z-index: 1; }
   transform: translateY(-2px);
 }
 
-/* ─── 9. Scroll Reveal Animations ───────────────────── */
+/* Scroll Reveal Animations */
 .reveal {
   opacity: 0;
   transform: translateY(28px);
@@ -296,7 +296,7 @@ section { position: relative; z-index: 1; }
 .reveal-delay-2              { transition-delay: 0.24s; }
 .reveal-delay-3              { transition-delay: 0.36s; }
 
-/* ─── 10. Keyframes ─────────────────────────────────── */
+/* Keyframes */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(24px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -413,7 +413,7 @@ section { position: relative; z-index: 1; }
   animation: fadeUp 0.7s 1s forwards;
 }
 
-/* ─── 12. Computer Setup ────────────────────────────── */
+/* 12. Computer Setup */
 .computer-wrapper {
   position: relative;
   z-index: 1;
@@ -482,7 +482,8 @@ section { position: relative; z-index: 1; }
   border-radius: 6px;
   overflow: hidden;
   position: relative;
-  min-height: 340px;
+  height: 340px;
+  max-height: 340px;
   border: 1px solid #0a2535;
 }
 
@@ -572,18 +573,21 @@ section { position: relative; z-index: 1; }
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
 }
 
-/* ─── 13. Terminal ──────────────────────────────────── */
+/* Terminal */
 #terminal {
   font-family: var(--font-mono);
   font-size: 0.78rem;
   color: var(--color-green);
   padding: 1rem;
-  height: 340px;           /* fixed height — crucial for scroll */
-  overflow-y: auto;
+  height: 340px;
+  min-height: 340px;
+  max-height: 340px;
+  overflow-y: scroll;
+  overflow-x: hidden;
   position: relative;
   z-index: 1;
   line-height: 1.65;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 /* Terminal line types */
@@ -613,7 +617,7 @@ section { position: relative; z-index: 1; }
 #terminal::-webkit-scrollbar-track { background: transparent; }
 #terminal::-webkit-scrollbar-thumb { background: var(--color-green2); border-radius: 2px; }
 
-/* ─── 14. Keyboard ──────────────────────────────────── */
+/* Keyboard */
 .keyboard {
   background: linear-gradient(145deg, #0f1f2d, #071218);
   border: 2px solid #1e4060;
@@ -668,7 +672,7 @@ section { position: relative; z-index: 1; }
 .wide-28  { min-width: 104px; }
 .key-space { min-width: 240px; }
 
-/* ─── 15. Mouse ─────────────────────────────────────── */
+/* Mouse */
 .mouse {
   width: 44px; height: 64px;
   background: linear-gradient(145deg, #0f1f2d, #071218);
@@ -698,7 +702,7 @@ section { position: relative; z-index: 1; }
   animation: scrollWheel 2s ease-in-out infinite;
 }
 
-/* ─── 16. About Section ─────────────────────────────── */
+/* About Section */
 #about { background: var(--color-bg2); }
 
 .about-grid {
@@ -772,7 +776,7 @@ section { position: relative; z-index: 1; }
   box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
 }
 
-/* ─── 17. Projects Section ──────────────────────────── */
+/* Projects Section */
 #projects { background: var(--color-bg); }
 
 .projects-grid {
@@ -833,7 +837,7 @@ section { position: relative; z-index: 1; }
 }
 .project-link:hover { color: var(--color-green); text-shadow: var(--glow-green); }
 
-/* ─── 18. Certifications Section ────────────────────── */
+/* Certifications Section */
 #certifications { background: var(--color-bg2); }
 
 .certs-grid {
@@ -874,7 +878,7 @@ section { position: relative; z-index: 1; }
 .cert-issuer { font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-amber); margin-bottom: 0.4rem; }
 .cert-year   { font-family: var(--font-mono); font-size: 0.65rem; color: var(--color-muted); }
 
-/* ─── 19. Education Section ─────────────────────────── */
+/* Education Section  */
 #education { background: var(--color-bg); }
 
 .edu-timeline {
@@ -908,7 +912,7 @@ section { position: relative; z-index: 1; }
 .edu-school { font-size: 0.9rem; color: var(--color-cyan); margin-bottom: 0.5rem; }
 .edu-desc   { font-size: 0.85rem; color: var(--color-muted); max-width: 580px; line-height: 1.65; }
 
-/* ─── 20. Experience Section ────────────────────────── */
+/* Experience Section */
 #experience { background: var(--color-bg2); }
 
 .exp-grid { display: grid; gap: 1.5rem; }
@@ -941,7 +945,7 @@ section { position: relative; z-index: 1; }
   padding: 0.3rem 0.65rem;
 }
 
-/* ─── 21. Contact Section ───────────────────────────── */
+/* Contact Section */
 #contact { background: var(--color-bg); }
 
 .contact-grid {
@@ -1031,7 +1035,7 @@ section { position: relative; z-index: 1; }
 .form-status.success { background: rgba(0, 255, 136, 0.09); color: var(--color-green); border: 1px solid var(--color-green); display: block; }
 .form-status.error   { background: rgba(255, 56, 96, 0.09);  color: var(--color-red);   border: 1px solid var(--color-red);   display: block; }
 
-/* ─── 22. Footer ────────────────────────────────────── */
+/* Footer */
 footer {
   background: var(--color-bg2);
   border-top: 1px solid var(--color-border);
@@ -1088,7 +1092,7 @@ footer {
 .footer-copy { font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-muted); }
 .footer-copy .heart { color: var(--color-red); }
 
-/* ─── 23. Responsive Breakpoints ────────────────────── */
+/* Responsive Breakpoints */
 @media (max-width: 900px) {
   .about-grid   { grid-template-columns: 1fr; gap: 2.5rem; }
   .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }

@@ -1,103 +1,166 @@
 /**
- * terminal.js
- * Interactive terminal for the computer setup hero section.
- * Handles: typing, command parsing, history, autocomplete, matrix mode.
- *
- * BUG FIX: The active input line is always appended at the BOTTOM of
- * #terminal. We use scrollTop = scrollHeight after every DOM change
- * so the view never jumps back to the top.
+ * terminal.js — KristofferOS Interactive Terminal
+ * Scroll approach: the input line is ALWAYS the last child,
+ * and we use a dedicated invisible anchor div at the very
+ * bottom that we scrollIntoView() — this works 100% regardless
+ * of container height, overflow, or flex settings.
  */
 
 (() => {
   'use strict';
 
-  /* ── DOM refs ────────────────────────────────────── */
   const termEl  = document.getElementById('terminal');
   const wrapper = document.getElementById('computerWrapper');
   const hint    = wrapper ? wrapper.querySelector('.click-hint') : null;
 
-  if (!termEl || !wrapper) return;   // guard if elements missing
+  if (!termEl || !wrapper) return;
 
-  /* ── State ───────────────────────────────────────── */
-  let isActive        = false;
-  let currentInput    = '';
-  let commandHistory  = [];
-  let historyIdx      = -1;
-  let matrixMode      = false;
-  let matrixTimer     = null;
+  /* ── State ── */
+  let isActive       = false;
+  let currentInput   = '';
+  let cmdHistory     = [];
+  let historyIdx     = -1;
+  let matrixMode     = false;
+  let matrixTimer    = null;
 
-  /* ── Boot greeting ───────────────────────────────── */
+  /* ── Invisible scroll anchor ── */
+  const anchor = document.createElement('div');
+  anchor.id = 'termAnchor';
+  anchor.style.cssText = 'height:1px;width:100%;flex-shrink:0;';
+
+  /* ── The ONE scroll function ── */
+  function goToBottom() {
+    termEl.appendChild(anchor);
+    termEl.scrollTop = termEl.scrollHeight;
+}
+
+  /* ── Escape HTML ── */
+  function esc(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  /* ── Append a single output line ── */
+  function addLine(html) {
+    const d = document.createElement('div');
+    d.className = 'term-line';
+    d.innerHTML = html;
+    // Insert BEFORE anchor so anchor stays last
+    termEl.insertBefore(d, anchor);
+    goToBottom();
+  }
+
+  /* ── Append multiple output lines ── */
+  function addLines(lines) {
+    if (!lines) return;
+    lines.forEach(html =>
+      addLine(`<span class="term-output">${html}</span>`)
+    );
+  }
+
+  /* ── Render the input prompt at the bottom ── */
+  function renderPrompt() {
+    const old = document.getElementById('activeInputLine');
+    if (old) old.remove();
+
+    const d = document.createElement('div');
+    d.className = 'term-input-line';
+    d.id = 'activeInputLine';
+    d.innerHTML =
+      `<span class="term-prompt">visitor</span>` +
+      `<span style="color:var(--color-muted)">@</span>` +
+      `<span class="term-path">kristoffer-os</span>` +
+      `<span style="color:var(--color-muted)">:~$&nbsp;</span>` +
+      `<span class="term-input-display" id="termText">${esc(currentInput)}</span>` +
+      `<span class="term-cursor-blink"></span>`;
+
+    // Insert BEFORE anchor
+    termEl.insertBefore(d, anchor);
+    goToBottom();
+  }
+
+  /* ── Boot greeting ── */
   const GREETING = [
-    { html: '<span class="term-greeting">╔══════════════════════════════════════════════╗</span>' },
-    { html: '<span class="term-greeting">║   KristofferOS v2.0  —  Welcome, Visitor!    ║</span>' },
-    { html: '<span class="term-greeting">║   Type <span class="term-info">help</span> to see available commands.         ║</span>' },
-    { html: '<span class="term-greeting">╚══════════════════════════════════════════════╝</span>' },
-    { html: '' },
+    '<span class="term-greeting">╔══════════════════════════════════════════════╗</span>',
+    '<span class="term-greeting">║&nbsp;&nbsp; KristofferOS v2.0 — Welcome, Visitor!&nbsp;&nbsp;&nbsp;&nbsp;║</span>',
+    '<span class="term-greeting">║&nbsp;&nbsp; Type <span class="term-info">help</span> to see available commands.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ║</span>',
+    '<span class="term-greeting">╚══════════════════════════════════════════════╝</span>',
+    '',
   ];
 
-  /* ── Command definitions ─────────────────────────── */
+  function initTerminal() {
+    termEl.innerHTML = '';
+    termEl.appendChild(anchor); // anchor first
+    currentInput = '';
+    GREETING.forEach(html =>
+      addLine(`<span class="term-output">${html}</span>`)
+    );
+    renderPrompt();
+  }
+
+  /* ── Commands ── */
   const COMMANDS = {
     help: () => [
       '<span class="term-info">Available commands:</span>',
-      '  <span class="term-success">about</span>      — Who is Kristoffer?',
-      '  <span class="term-success">skills</span>     — Tech stack &amp; tools',
-      '  <span class="term-success">projects</span>   — Notable projects',
-      '  <span class="term-success">contact</span>    — How to reach me',
-      '  <span class="term-success">socials</span>    — Social media links',
-      '  <span class="term-success">whoami</span>     — Display visitor info',
-      '  <span class="term-success">date</span>       — Current date/time',
-      '  <span class="term-success">joke</span>       — A dev joke 😄',
-      '  <span class="term-success">matrix</span>     — Go deeper into the rabbit hole',
-      '  <span class="term-success">clear</span>      — Clear the terminal',
+      '&nbsp;&nbsp;<span class="term-success">about</span>      — Who is Kristoffer?',
+      '&nbsp;&nbsp;<span class="term-success">skills</span>     — Tech stack &amp; tools',
+      '&nbsp;&nbsp;<span class="term-success">projects</span>   — Notable projects',
+      '&nbsp;&nbsp;<span class="term-success">contact</span>    — How to reach me',
+      '&nbsp;&nbsp;<span class="term-success">socials</span>    — Social media links',
+      '&nbsp;&nbsp;<span class="term-success">whoami</span>     — Display visitor info',
+      '&nbsp;&nbsp;<span class="term-success">date</span>       — Current date/time',
+      '&nbsp;&nbsp;<span class="term-success">joke</span>       — A dev joke 😄',
+      '&nbsp;&nbsp;<span class="term-success">matrix</span>     — Go deeper into the rabbit hole',
+      '&nbsp;&nbsp;<span class="term-success">clear</span>      — Clear the terminal',
     ],
 
     about: () => [
       '<span class="term-info">$ cat about.txt</span>',
-      'Name    : Kristoffer Ian Sioson',
-      'Role    : Software Engineer',
+      'Name&nbsp;&nbsp;&nbsp;&nbsp;: Kristoffer Ian Sioson',
+      'Role&nbsp;&nbsp;&nbsp;&nbsp;: Software Engineer',
       'Location: Philippines 🇵🇭',
       'Mission : Building elegant software that matters.',
-      'Status  : <span class="term-success">Open to opportunities ✓</span>',
+      'Status&nbsp;&nbsp;: <span class="term-success">Open to opportunities ✓</span>',
     ],
 
     skills: () => [
       '<span class="term-info">$ ls ./skills/ --all</span>',
-      '<span class="term-success">── Languages</span>   JavaScript  TypeScript  Python  SQL',
-      '<span class="term-success">── Frontend</span>    React  Next.js  Tailwind  D3.js',
-      '<span class="term-success">── Backend</span>     Node.js  FastAPI  GraphQL  REST',
-      '<span class="term-success">── Databases</span>   MongoDB  PostgreSQL  Redis  Firebase',
-      '<span class="term-success">── DevOps</span>      Docker  AWS  Git  Linux  CI/CD',
+      '<span class="term-success">── Languages</span>&nbsp;&nbsp; JavaScript  TypeScript  Python  SQL',
+      '<span class="term-success">── Frontend</span>&nbsp;&nbsp;&nbsp; React  Next.js  Tailwind  D3.js',
+      '<span class="term-success">── Backend</span>&nbsp;&nbsp;&nbsp;&nbsp; Node.js  FastAPI  GraphQL  REST',
+      '<span class="term-success">── Databases</span>&nbsp;&nbsp; MongoDB  PostgreSQL  Redis  Firebase',
+      '<span class="term-success">── DevOps</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Docker  AWS  Git  Linux  CI/CD',
     ],
 
     projects: () => [
       '<span class="term-info">$ git log --oneline --all</span>',
-      '<span class="term-success">a1b2c3d</span> 🛒 E-Commerce Platform       [React · Node · MongoDB]',
-      '<span class="term-success">e4f5g6h</span> 📊 Analytics Dashboard       [TS · D3.js · WebSockets]',
-      '<span class="term-success">i7j8k9l</span> 🤖 AI Chat Assistant         [Python · FastAPI · Redis]',
-      '<span class="term-success">m0n1o2p</span> 📱 Task Management App       [React Native · GraphQL]',
-      '<span class="term-success">q3r4s5t</span> 🔐 Auth Microservice         [Node · JWT · Docker]',
-      '<span class="term-success">u6v7w8x</span> 🌐 Portfolio CMS             [Next.js · Sanity · Vercel]',
-      '',
-      '<span class="term-comment">// Scroll down on the page to see full project details</span>',
+      '<span class="term-success">a1b2c3d</span> 🛒 E-Commerce Platform',
+      '<span class="term-success">e4f5g6h</span> 📊 Analytics Dashboard',
+      '<span class="term-success">i7j8k9l</span> 🤖 AI Chat Assistant',
+      '<span class="term-success">m0n1o2p</span> 📱 Task Management App',
+      '<span class="term-success">q3r4s5t</span> 🔐 Auth Microservice',
+      '<span class="term-success">u6v7w8x</span> 🌐 Portfolio CMS',
+      '<span class="term-comment">// Scroll down on the page to see full details</span>',
     ],
 
     contact: () => [
       '<span class="term-info">$ cat contact.json</span>',
       '{',
-      '  <span class="term-success">"email"</span>    : "kristofferiansioson@email.com",',
-      '  <span class="term-success">"instagram"</span>: "@yourusername",',
-      '  <span class="term-success">"facebook"</span> : "Kristoffer Ian Sioson",',
-      '  <span class="term-success">"github"</span>   : "github.com/yourusername",',
-      '  <span class="term-success">"linkedin"</span> : "linkedin.com/in/yourusername"',
+      '&nbsp;&nbsp;<span class="term-success">"email"</span>    : "ianzsioszon@gmail.com",',
+      '&nbsp;&nbsp;<span class="term-success">"instagram"</span>: "@nai.ts03",',
+      '&nbsp;&nbsp;<span class="term-success">"facebook"</span> : "facebook.com/non.trid.1",',
+      '&nbsp;&nbsp;<span class="term-success">"github"</span>   : "github.com/iansiosontech"',
       '}',
     ],
 
     socials: () => [
       '<span class="term-info">$ open ./socials/</span>',
-      '📸 <span class="term-success">Instagram</span> : instagram.com/yourusername',
-      '📘 <span class="term-success">Facebook</span>  : facebook.com/yourusername',
-      '🐙 <span class="term-success">GitHub</span>    : github.com/yourusername',
-      '💼 <span class="term-success">LinkedIn</span>  : linkedin.com/in/yourusername',
+      '📸 <span class="term-success">Instagram</span> : instagram.com/nai.ts03',
+      '📘 <span class="term-success">Facebook</span>  : facebook.com/non.trid.1',
+      '🐙 <span class="term-success">GitHub</span>    : github.com/iansiosontech',
+      '💼 <span class="term-success">LinkedIn</span>  : linkedin.com/in/kristoffer-ian-sioson',
     ],
 
     whoami: () => [
@@ -112,123 +175,58 @@
 
     joke: () => {
       const jokes = [
-        'Why do programmers prefer dark mode?\n  <span class="term-info">Light attracts bugs.</span>',
-        'A SQL query walks into a bar, walks up to two tables…\n  <span class="term-info">"Can I JOIN you?"</span>',
-        'Why do Java developers wear glasses?\n  <span class="term-info">Because they don\'t C#.</span>',
-        '99 little bugs in the code, 99 little bugs…\n  <span class="term-info">Take one down, patch it around — 127 little bugs in the code.</span>',
-        'There are only 10 types of people:\n  <span class="term-info">those who understand binary, and those who don\'t.</span>',
-        'A programmer\'s wife says: "Go to the store and get a gallon of milk, and if they have eggs, get a dozen."\n  <span class="term-info">He comes home with 12 gallons of milk. They had eggs.</span>',
+        'Why do programmers prefer dark mode?\n<span class="term-info">Light attracts bugs.</span>',
+        'Why do Java developers wear glasses?\n<span class="term-info">Because they don\'t C#.</span>',
+        'There are only 10 types of people:\n<span class="term-info">those who understand binary, and those who don\'t.</span>',
+        '99 little bugs in the code…\n<span class="term-info">Take one down — 127 bugs in the code.</span>',
+        'A SQL query walks into a bar…\n<span class="term-info">"Can I JOIN you?"</span>',
       ];
-      return [ jokes[Math.floor(Math.random() * jokes.length)] ];
+      return [jokes[Math.floor(Math.random() * jokes.length)]];
     },
 
     matrix: () => {
       startMatrix();
-      return [ '<span class="term-info">Initialising Matrix… press any key to exit.</span>' ];
+      return ['<span class="term-info">Initialising Matrix… press any key to exit.</span>'];
     },
 
     clear: () => {
       termEl.innerHTML = '';
-      appendInputLine();
-      return null;   // null = skip renderLines
+      termEl.appendChild(anchor);
+      renderPrompt();
+      return null;
     },
   };
 
-  /* ── Helpers ─────────────────────────────────────── */
-  function escHtml(str) {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-  }
+  /* ── Execute a command ── */
+  function execute(raw) {
+    const cmd = raw.trim().toLowerCase();
 
-  /**
-   * scrollToBottom — always keep the view at the end of the terminal.
-   * Called after EVERY DOM mutation inside #terminal.
-   */
-  function scrollToBottom() {
-    termEl.scrollTop = termEl.scrollHeight;
-  }
-
-  /* ── Render helpers ──────────────────────────────── */
-  function appendLine(html) {
-    const div = document.createElement('div');
-    div.className = 'term-line';
-    div.innerHTML = html;
-    termEl.appendChild(div);
-    scrollToBottom();
-  }
-
-  function appendOutputLines(lines) {
-    if (!lines) return;
-    lines.forEach(html => appendLine(`<span class="term-output">${html}</span>`));
-  }
-
-  /**
-   * appendInputLine — creates the editable prompt row at the bottom.
-   * Always removes any existing active row first to avoid duplicates.
-   */
-  function appendInputLine() {
-    // Remove previous active row if it exists
-    const old = document.getElementById('activeInputLine');
-    if (old) old.remove();
-
-    const div = document.createElement('div');
-    div.className = 'term-input-line';
-    div.id = 'activeInputLine';
-    div.innerHTML = `
-      <span class="term-prompt">visitor</span><!--
-      --><span style="color:var(--color-muted)">@</span><!--
-      --><span class="term-path">kristoffer-os</span><!--
-      --><span style="color:var(--color-muted)">:~$&nbsp;</span><!--
-      --><span class="term-input-display" id="termText">${escHtml(currentInput)}</span><!--
-      --><span class="term-cursor-blink"></span>
-    `;
-    termEl.appendChild(div);
-    scrollToBottom();
-  }
-
-  /* ── Boot sequence ───────────────────────────────── */
-  function initTerminal() {
-    termEl.innerHTML = '';
-    currentInput = '';
-    GREETING.forEach(({ html }) => appendLine(`<span class="term-output">${html}</span>`));
-    appendInputLine();
-  }
-
-  /* ── Command execution ───────────────────────────── */
-  function executeCommand(rawCmd) {
-    const cmd = rawCmd.trim().toLowerCase();
-
-    // 1. Freeze the current prompt (remove cursor + id)
-    const activeEl = document.getElementById('activeInputLine');
-    if (activeEl) {
-      activeEl.id = '';
-      const blink = activeEl.querySelector('.term-cursor-blink');
+    // Freeze current prompt (remove cursor + id)
+    const active = document.getElementById('activeInputLine');
+    if (active) {
+      active.id = '';
+      const blink = active.querySelector('.term-cursor-blink');
       if (blink) blink.remove();
+      // Added here to fix the issue of the prompt going back to the first line yes fucking shit finally i think
+      const oldText = active.querySelector('#termText');
+      if (oldText) oldText.removeAttribute('id');
     }
 
-    // 2. Echo the typed command in the frozen prompt row
-    //    (the textContent was already showing it; just strip the cursor)
-
-    // 3. Run handler
-    const handler = COMMANDS[cmd];
-    if (handler) {
-      const result = handler();
-      appendOutputLines(result);
+    const fn = COMMANDS[cmd];
+    if (fn) {
+      const result = fn();
+      addLines(result);
     } else if (cmd !== '') {
-      appendOutputLines([
-        `<span class="term-error">command not found: ${escHtml(rawCmd)}</span>` +
-        ` — type <span class="term-info">help</span> for available commands`,
+      addLines([
+        `<span class="term-error">command not found: ${esc(raw)}</span> — type <span class="term-info">help</span>`,
       ]);
     }
 
-    // 4. New prompt at the bottom (unless clear already did it)
-    if (cmd !== 'clear') appendInputLine();
+    if (cmd !== 'clear') renderPrompt();
   }
 
-  /* ── Matrix easter egg ───────────────────────────── */
-  const MATRIX_CHARS = 'アイウエオカキクケコサシスセソ0123456789ABCDEF<>{}[]()'.split('');
+  /* ── Matrix ── */
+  const MC = 'アイウエオカキクケコ0123456789ABCDEF<>{}[]'.split('');
 
   function startMatrix() {
     matrixMode = true;
@@ -236,24 +234,22 @@
       const row = document.createElement('div');
       row.innerHTML =
         `<span style="color:var(--color-green);opacity:${Math.random().toFixed(2)}">` +
-        Array.from({ length: 50 }, () =>
-          MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)]
-        ).join(' ') +
+        Array.from({ length: 45 }, () => MC[Math.floor(Math.random() * MC.length)]).join(' ') +
         '</span>';
-      termEl.appendChild(row);
-      scrollToBottom();
-    }, 70);
-    setTimeout(stopMatrix, 4500);
+      termEl.insertBefore(row, anchor);
+      goToBottom();
+    }, 80);
+    setTimeout(stopMatrix, 4000);
   }
 
   function stopMatrix() {
     if (!matrixMode) return;
     matrixMode = false;
     clearInterval(matrixTimer);
-    appendInputLine();
+    renderPrompt();
   }
 
-  /* ── Key flash on visual keyboard ───────────────── */
+  /* ── Flash a key on the visual keyboard ── */
   function flashKey(key) {
     const el = document.querySelector(`.key[data-key="${key}"]`);
     if (!el) return;
@@ -261,59 +257,55 @@
     setTimeout(() => el.classList.remove('pressed'), 130);
   }
 
-  /* ── Keyboard handler ────────────────────────────── */
+  /* ── Global keydown handler ── */
   document.addEventListener('keydown', e => {
     if (!isActive) return;
-
-    // Exit matrix on any key
     if (matrixMode) { stopMatrix(); e.preventDefault(); return; }
+
+    const pageKeys = [' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Backspace', 'Enter', 'PageUp', 'PageDown', 'Home', 'End'];
+    if (pageKeys.includes(e.key)) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    }
 
     const textEl = document.getElementById('termText');
     if (!textEl) return;
 
     switch (e.key) {
       case 'Enter':
-        e.preventDefault();
         flashKey('Enter');
         if (currentInput.trim()) {
-          commandHistory.unshift(currentInput);
+          cmdHistory.unshift(currentInput);
           historyIdx = -1;
         }
-        const cmd = currentInput;
+        const toRun = currentInput;
         currentInput = '';
-        executeCommand(cmd);
+        execute(toRun);
         break;
 
       case 'Backspace':
-        e.preventDefault();
         flashKey('Backspace');
         currentInput = currentInput.slice(0, -1);
         textEl.textContent = currentInput;
-        scrollToBottom();
         break;
 
       case 'ArrowUp':
-        e.preventDefault();
-        historyIdx = Math.min(historyIdx + 1, commandHistory.length - 1);
-        currentInput = commandHistory[historyIdx] ?? '';
+        historyIdx = Math.min(historyIdx + 1, cmdHistory.length - 1);
+        currentInput = cmdHistory[historyIdx] ?? '';
         textEl.textContent = currentInput;
         break;
 
       case 'ArrowDown':
-        e.preventDefault();
         historyIdx = Math.max(historyIdx - 1, -1);
-        currentInput = historyIdx < 0 ? '' : commandHistory[historyIdx];
+        currentInput = historyIdx < 0 ? '' : cmdHistory[historyIdx];
         textEl.textContent = currentInput;
         break;
 
       case 'Tab':
-        e.preventDefault();
         const partial = currentInput.toLowerCase();
-        const match   = Object.keys(COMMANDS).find(k => k.startsWith(partial) && k !== partial);
-        if (match) {
-          currentInput = match;
-          textEl.textContent = currentInput;
-        }
+        const match = Object.keys(COMMANDS).find(k => k.startsWith(partial) && k !== partial);
+        if (match) { currentInput = match; textEl.textContent = currentInput; }
         break;
 
       default:
@@ -321,17 +313,16 @@
           currentInput += e.key;
           textEl.textContent = currentInput;
           flashKey(e.key.toLowerCase());
-          scrollToBottom();
         }
     }
   });
 
-  /* ── Activate / deactivate computer ─────────────── */
+  /* ── Activate terminal on click ── */
   wrapper.addEventListener('click', () => {
     isActive = true;
     wrapper.classList.add('active');
     if (hint) hint.classList.add('hidden');
-    if (termEl.children.length === 0) initTerminal();
+    if (!document.getElementById('termAnchor')) initTerminal();
   });
 
   document.addEventListener('click', e => {
@@ -341,25 +332,22 @@
     }
   });
 
-  /* ── Visual keyboard → dispatch keydown ─────────── */
+  /* ── Visual keyboard clicks ── */
   document.querySelectorAll('.key').forEach(keyEl => {
     keyEl.addEventListener('click', e => {
-      e.stopPropagation();    // don't bubble to document (would deactivate)
+      e.stopPropagation();
       if (!isActive) {
-        // First click on a key also activates the terminal
         isActive = true;
         wrapper.classList.add('active');
         if (hint) hint.classList.add('hidden');
-        if (termEl.children.length === 0) initTerminal();
+        if (!document.getElementById('termAnchor')) initTerminal();
       }
       const key = keyEl.dataset.key;
-      if (key) {
-        document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
-      }
+      if (key) document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
     });
   });
 
-  /* ── Boot on page load ───────────────────────────── */
+  /* ── Boot ── */
   setTimeout(initTerminal, 1200);
 
 })();
