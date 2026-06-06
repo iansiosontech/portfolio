@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KIS — Fun Zone 🎮</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:        #050a0e;
+      --bg2:       #080f15;
+      --panel:     #0a1520;
+      --border:    #1a3a4a;
+      --green:     #00ff88;
+      --green2:    #00cc66;
+      --cyan:      #00e5ff;
+      --amber:     #ffb300;
+      --red:       #ff3860;
+      --pink:      #ff6eb4;
+      --purple:    #b066ff;
+      --text:      #c8d8e4;
+      --muted:     #4a6a7a;
+      --glow-g:    0 0 8px #00ff8866, 0 0 24px #00ff8833;
+      --glow-c:    0 0 8px #00e5ff66, 0 0 24px #00e5ff33;
+      --glow-p:    0 0 8px #b066ff66, 0 0 24px #b066ff33;
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-head: 'Orbitron', sans-serif;
+      --font-body: 'Exo 2', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    /* Grid bg */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    /* Cursor */
+    #cursor {
+      position: fixed; top: 0; left: 0; z-index: 9999;
+      width: 20px; height: 20px;
+      border: 2px solid var(--green);
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%,-50%);
+      transition: transform 0.1s, border-color 0.2s;
+      mix-blend-mode: screen;
+    }
+    #cursor-dot {
+      position: fixed; top: 0; left: 0; z-index: 9999;
+      width: 4px; height: 4px;
+      background: var(--green); border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%,-50%);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--green2); border-radius: 3px; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 3rem;
+      background: rgba(5,10,14,0.9);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--font-head);
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--green); text-shadow: var(--glow-g);
+      letter-spacing: 3px; text-decoration: none;
+    }
+    .nav-logo span { color: var(--cyan); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-mono); font-size: 0.78rem;
+      color: var(--muted); text-decoration: none;
+      letter-spacing: 1px; transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--green); text-shadow: var(--glow-g); }
+    .nav-links a.active::before { content: '> '; }
+
+    /* PAGE HERO */
+    .page-hero {
+      position: relative; z-index: 1;
+      padding: 8rem 2rem 4rem;
+      text-align: center;
+    }
+    .page-tag {
+      font-family: var(--font-mono); font-size: 0.72rem;
+      color: var(--green); letter-spacing: 4px;
+      text-transform: uppercase; margin-bottom: 1rem;
+    }
+    .page-title {
+      font-family: var(--font-head);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900; color: #fff;
+      letter-spacing: 3px; margin-bottom: 1rem;
+      text-shadow: 0 0 40px rgba(0,255,136,0.2);
+    }
+    .page-title span { color: var(--green); }
+    .page-desc {
+      font-family: var(--font-mono); font-size: 0.8rem;
+      color: var(--muted); max-width: 500px; margin: 0 auto;
+      letter-spacing: 1px; line-height: 1.8;
+    }
+
+    /* GAMES GRID */
+    .games-section {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto;
+      padding: 2rem 2rem 6rem;
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* GAME CARD */
+    .game-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
+    .game-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--green2);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px rgba(0,255,136,0.08);
+    }
+    .game-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--green), var(--cyan));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.35s;
+    }
+    .game-card:hover::before { transform: scaleX(1); }
+
+    .game-card-preview {
+      height: 180px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem;
+      background: linear-gradient(135deg, rgba(0,255,136,0.05), rgba(0,229,255,0.05));
+      border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .game-card-preview .preview-emoji { z-index: 1; position: relative; }
+    .game-card-preview::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(0,255,136,0.08), transparent 70%);
+    }
+
+    /* Coming soon card */
+    .game-card.coming-soon { opacity: 0.6; }
+    .game-card.coming-soon:hover { transform: none; border-color: var(--border); box-shadow: none; }
+    .game-card.coming-soon::before { display: none; }
+    .coming-badge {
+      position: absolute; top: 12px; right: 12px;
+      font-family: var(--font-mono); font-size: 0.6rem;
+      color: var(--amber); border: 1px solid var(--amber);
+      border-radius: 4px; padding: 0.2rem 0.5rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      background: rgba(255,179,0,0.08);
+    }
+
+    .game-card-body { padding: 1.5rem; }
+    .game-card-title {
+      font-family: var(--font-head); font-size: 0.9rem;
+      color: #fff; letter-spacing: 1px; margin-bottom: 0.5rem;
+    }
+    .game-card-desc {
+      font-size: 0.83rem; color: var(--muted);
+      line-height: 1.65; margin-bottom: 1.2rem;
+    }
+    .game-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 0.5rem;
+    }
+    .game-difficulty {
+      font-family: var(--font-mono); font-size: 0.65rem;
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .diff-easy   { color: var(--green); }
+    .diff-medium { color: var(--amber); }
+    .diff-hard   { color: var(--red);   }
+
+    .btn-play {
+      font-family: var(--font-mono); font-size: 0.72rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 0.5rem 1.2rem;
+      border-radius: 6px; border: 1px solid var(--green);
+      background: transparent; color: var(--green);
+      cursor: pointer; text-decoration: none;
+      transition: all 0.2s; display: inline-block;
+    }
+    .btn-play:hover {
+      background: rgba(0,255,136,0.1);
+      box-shadow: 0 0 16px rgba(0,255,136,0.2);
+    }
+    .btn-github {
+      font-family: var(--font-mono); font-size: 0.72rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 0.5rem 1.2rem;
+      border-radius: 6px; border: 1px solid var(--border);
+      background: transparent; color: var(--muted);
+      cursor: pointer; text-decoration: none;
+      transition: all 0.2s; display: inline-block;
+    }
+    .btn-github:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* FOOTER */
+    footer {
+      position: relative; z-index: 1;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 2rem; text-align: center;
+      font-family: var(--font-mono); font-size: 0.7rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--green); text-decoration: none; }
+    footer a:hover { text-shadow: var(--glow-g); }
+
+    /* ═══════════════════════════════════════════
+       GAME OVERLAY — full screen canvas for games
+    ═══════════════════════════════════════════ */
+    #gameOverlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 5000;
+      background: rgba(2, 8, 12, 0.97);
+      backdrop-filter: blur(8px);
+      align-items: center; justify-content: center;
+      flex-direction: column;
+    }
+    #gameOverlay.open { display: flex; }
+
+    .game-close {
+    position: fixed;
+    top: 1.5rem;
+    right: 2rem;
+    z-index: 9999;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 2px; 
+    }
+    .game-close:hover { color: var(--red); border-color: var(--red); }
+
+    /* ═══════════════════
+       GAME 1 — CLICK ME
+    ═══════════════════ */
+    #game1 { width: 100%; height: 100%; position: relative; display: none; align-items: center; justify-content: center; }
+    #game1.active { display: flex; }
+
+    /* Progress dots */
+    #g1Dots {
+      position: absolute; top: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 0.6rem;
+    }
+    .g1-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      border: 1px solid var(--muted);
+      transition: all 0.3s;
+    }
+    .g1-dot.filled { background: var(--green); border-color: var(--green); box-shadow: var(--glow-g); }
+
+    /* Phase label */
+    #g1Phase {
+      position: absolute; top: 3.5rem; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: 0.7rem;
+      color: var(--muted); letter-spacing: 3px; text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* The elusive button */
+    #clickMeBtn {
+      position: absolute;
+      font-family: var(--font-head); font-size: clamp(1.2rem, 3vw, 2rem);
+      font-weight: 900; letter-spacing: 4px;
+      color: #fff; background: transparent;
+      border: 2px solid var(--green);
+      border-radius: 12px; padding: 1.2rem 2.5rem;
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(0,255,136,0.2);
+      transition: box-shadow 0.2s, border-color 0.2s;
+      user-select: none;
+      left: 50%; top: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+    }
+    #clickMeBtn::before {
+      content: '';
+      position: absolute; inset: -4px;
+      border-radius: 14px;
+      border: 1px solid rgba(0,255,136,0.2);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { transform: scale(1); opacity: 0.5; }
+      50%      { transform: scale(1.05); opacity: 1; }
+    }
+    #clickMeBtn:hover {
+      box-shadow: 0 0 50px rgba(0,255,136,0.4);
+      border-color: var(--cyan);
+    }
+    #clickMeBtn.phase2 {
+      animation: wiggle 0.3s ease-in-out;
+    }
+    @keyframes wiggle {
+      0%,100% { transform: translate(-50%,-50%) rotate(0deg); }
+      25%      { transform: translate(-50%,-50%) rotate(-3deg) scale(1.05); }
+      75%      { transform: translate(-50%,-50%) rotate(3deg) scale(1.05); }
+    }
+
+    /* Taunt messages */
+    #g1Taunt {
+      position: absolute; bottom: 6rem; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: 0.85rem;
+      color: var(--amber); letter-spacing: 2px; text-align: center;
+      opacity: 0; transition: opacity 0.4s;
+      white-space: nowrap;
+    }
+    #g1Taunt.show { opacity: 1; }
+
+    /* Floating particles on win */
+    .confetti-piece {
+      position: absolute;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: confettiFall linear forwards;
+    }
+    @keyframes confettiFall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* WIN screen */
+    #g1Win {
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 2rem;
+    }
+    #g1Win.show { display: flex; }
+
+    .win-cake { font-size: 5rem; margin-bottom: 1rem; animation: cakeBounce 0.6s ease-out; }
+    @keyframes cakeBounce {
+      0%   { transform: scale(0) rotate(-10deg); }
+      60%  { transform: scale(1.2) rotate(5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+    .win-title {
+      font-family: var(--font-head); font-size: clamp(1.5rem, 4vw, 2.5rem);
+      font-weight: 900; color: var(--green);
+      text-shadow: var(--glow-g); letter-spacing: 3px;
+      margin-bottom: 0.5rem;
+    }
+    .win-subtitle {
+      font-family: var(--font-mono); font-size: 0.9rem;
+      color: var(--cyan); margin-bottom: 2rem; letter-spacing: 2px;
+    }
+    .win-msg {
+      font-size: 0.9rem; color: var(--muted);
+      max-width: 400px; line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+    .win-stats {
+      display: flex; gap: 2rem; margin-bottom: 2rem; flex-wrap: wrap; justify-content: center;
+    }
+    .win-stat {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1rem 1.5rem; text-align: center;
+    }
+    .win-stat-num {
+      font-family: var(--font-head); font-size: 1.5rem;
+      color: var(--green); display: block;
+    }
+    .win-stat-label { font-family: var(--font-mono); font-size: 0.65rem; color: var(--muted); letter-spacing: 2px; }
+
+    .btn-restart {
+      font-family: var(--font-mono); font-size: 0.78rem;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 0.85rem 2rem; border-radius: 8px;
+      border: none; background: var(--green); color: #020c10;
+      cursor: pointer; font-weight: 700;
+      box-shadow: 0 0 20px rgba(0,255,136,0.3);
+      transition: all 0.2s;
+    }
+    .btn-restart:hover { background: var(--green2); box-shadow: 0 0 36px rgba(0,255,136,0.5); transform: translateY(-2px); }
+
+    /* Keyframes */
+    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { gap: 1rem; }
+      .nav-links a { font-size: 0.68rem; }
+      body { cursor: auto; }
+      #cursor, #cursor-dot { display: none; }
+    }
+    @media (max-width: 480px) {
+      .games-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div id="cursor"></div>
+  <div id="cursor-dot"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">K<span>.</span>IS</a>
+    <ul class="nav-links">
+      <li><a href="index.html#hero">_home</a></li>
+      <li><a href="index.html#about">_about</a></li>
+      <li><a href="index.html#projects">_projects</a></li>
+      <li><a href="index.html#contact">_contact</a></li>
+      <li><a href="games.html" class="active">_fun</a></li>
+    </ul>
+  </nav>
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div class="page-tag">// Interactive Zone</div>
+    <h1 class="page-title">Fun <span>Games</span></h1>
+    <p class="page-desc">A collection of weird, fun, and interactive experiments.<br/>More games dropping soon — stay tuned. 👾</p>
+  </div>
+
+  <!-- GAMES GRID -->
+  <div class="games-section">
+    <div class="games-grid">
+
+      <!-- Game 1 — Click Me -->
+      <div class="game-card">
+        <div class="game-card-preview">
+          <span class="preview-emoji">🎯</span>
+        </div>
+        <div class="game-card-body">
+          <div class="game-card-title">CLICK ME — If You Can</div>
+          <p class="game-card-desc">A deceptively simple button that refuses to be clicked. Can you outsmart it? There's a secret reward waiting for the patient ones.</p>
+          <div class="game-card-footer">
+            <span class="game-difficulty diff-easy">// Easy... or is it?</span>
+            <button class="btn-play" onclick="openGame('game1')">▶ Play</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coming Soon cards -->
+      <div class="game-card coming-soon">
+        <div class="coming-badge">Coming Soon</div>
+        <div class="game-card-preview"><span class="preview-emoji">🐍</span></div>
+        <div class="game-card-body">
+          <div class="game-card-title">SNAKE — Terminal Edition</div>
+          <p class="game-card-desc">Classic snake game but with a terminal hacker aesthetic. Eat the data packets, don't crash the server.</p>
+          <div class="game-card-footer">
+            <span class="game-difficulty diff-medium">// Medium</span>
+            <a class="btn-github" href="https://github.com/iansiosontech" target="_blank">🐙 GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-card coming-soon">
+        <div class="coming-badge">Coming Soon</div>
+        <div class="game-card-preview"><span class="preview-emoji">🧠</span></div>
+        <div class="game-card-body">
+          <div class="game-card-title">MEMORY — Code Edition</div>
+          <p class="game-card-desc">Match pairs of programming language logos before time runs out. Tests your dev knowledge and memory at the same time.</p>
+          <div class="game-card-footer">
+            <span class="game-difficulty diff-medium">// Medium</span>
+            <a class="btn-github" href="https://github.com/iansiosontech" target="_blank">🐙 GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-card coming-soon">
+        <div class="coming-badge">Coming Soon</div>
+        <div class="game-card-preview"><span class="preview-emoji">💣</span></div>
+        <div class="game-card-body">
+          <div class="game-card-title">BUG HUNT — Minesweeper</div>
+          <p class="game-card-desc">Minesweeper but the mines are bugs in your codebase. Flag them before they crash production. Classic, chaotic, beautiful.</p>
+          <div class="game-card-footer">
+            <span class="game-difficulty diff-hard">// Hard</span>
+            <a class="btn-github" href="https://github.com/iansiosontech" target="_blank">🐙 GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-card coming-soon">
+        <div class="coming-badge">Coming Soon</div>
+        <div class="game-card-preview"><span class="preview-emoji">⌨️</span></div>
+        <div class="game-card-body">
+          <div class="game-card-title">TYPE RACER — Dev Quotes</div>
+          <p class="game-card-desc">Race against the clock typing famous developer quotes and code snippets. The faster you type, the more you flex.</p>
+          <div class="game-card-footer">
+            <span class="game-difficulty diff-easy">// Easy</span>
+            <a class="btn-github" href="https://github.com/iansiosontech" target="_blank">🐙 GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-card coming-soon">
+        <div class="coming-badge">Coming Soon</div>
+        <div class="game-card-preview"><span class="preview-emoji">🎲</span></div>
+        <div class="game-card-body">
+          <div class="game-card-title">TRIVIA — Dev Edition</div>
+          <p class="game-card-desc">How well do you know programming history, languages, and culture? 30 questions, 30 seconds each. No googling allowed.</p>
+          <div class="game-card-footer">
+            <span class="game-difficulty diff-hard">// Hard</span>
+            <a class="btn-github" href="https://github.com/iansiosontech" target="_blank">🐙 GitHub</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="index.html">← Back to Portfolio</a>
+    &nbsp;|&nbsp;
+    More games coming soon — follow <a href="https://github.com/iansiosontech" target="_blank">@iansiosontech</a> on GitHub
+    &nbsp;|&nbsp;
+    Built with ♥ by Kristoffer Ian Sioson
+  </footer>
+
+  <!-- ═══════════════════════════════════════
+       FULL SCREEN GAME OVERLAY
+  ═══════════════════════════════════════ -->
+  <div id="gameOverlay">
+    <button class="game-close" onclick="closeGame()">✕ CLOSE</button>
+
+    <!-- ── GAME 1 ── -->
+    <div id="game1">
+      <!-- Phase dots -->
+      <div id="g1Dots"></div>
+      <div id="g1Phase">// phase 1 of 3</div>
+
+      <!-- The button -->
+      <button id="clickMeBtn">CLICK ME</button>
+
+      <!-- Taunt -->
+      <div id="g1Taunt"></div>
+
+      <!-- Win screen (hidden until win) -->
+      <div id="g1Win">
+        <div class="win-cake">🎂</div>
+        <div class="win-title">GOOD JOB, SPORT!</div>
+        <div class="win-subtitle">// Here's a cake! 🎉</div>
+        <p class="win-msg">
+          You actually did it. Most people give up around phase 2.<br/>
+          You are officially a certified button-clicker. We're proud of you. 🫡
+        </p>
+        <div class="win-stats">
+          <div class="win-stat">
+            <span class="win-stat-num" id="statClicks">0</span>
+            <span class="win-stat-label">Total Clicks</span>
+          </div>
+          <div class="win-stat">
+            <span class="win-stat-num" id="statMisses">0</span>
+            <span class="win-stat-label">Misses</span>
+          </div>
+          <div class="win-stat">
+            <span class="win-stat-num" id="statTime">0s</span>
+            <span class="win-stat-label">Time Taken</span>
+          </div>
+        </div>
+        <button class="btn-restart" onclick="restartGame1()">↺ Play Again</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ── Cursor ── */
+    const cursor = document.getElementById('cursor');
+    const dot    = document.getElementById('cursor-dot');
+    let mx = 0, my = 0, cx = 0, cy = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.transform = `translate(${mx}px,${my}px)`;
+    });
+    (function animCursor() {
+      cx += (mx - cx) * 0.18; cy += (my - cy) * 0.18;
+      cursor.style.transform = `translate(${cx}px,${cy}px)`;
+      requestAnimationFrame(animCursor);
+    })();
+
+    /* ── Game overlay ── */
+    function openGame(id) {
+      document.getElementById('gameOverlay').classList.add('open');
+      document.querySelectorAll('[id^="game"]').forEach(g => g.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if (id === 'game1') initGame1();
+    }
+    function closeGame() {
+      document.getElementById('gameOverlay').classList.remove('open');
+      clearInterval(timerInterval);
+    }
+
+    /* ══════════════════════════════════════
+       GAME 1 — CLICK ME
+    ══════════════════════════════════════ */
+    const PHASE1_CLICKS = 5;   // secret clicks before button runs
+    const PHASE2_CLICKS = 3;   // clicks while running before win
+
+    let phase        = 1;
+    let p1Count      = 0;   // clicks in phase 1
+    let p2Count      = 0;   // clicks in phase 2
+    let totalClicks  = 0;
+    let totalMisses  = 0;
+    let startTime    = null;
+    let timerInterval = null;
+    let isMoving     = false;
+
+    const TAUNTS_P1 = [
+      "Go ahead. Try.",
+      "Nothing's happening 👀",
+      "You sure about that?",
+      "Keep clicking... 😏",
+      "Almost... not really.",
+    ];
+    const TAUNTS_P2 = [
+      "Too slow! 😂",
+      "Nope!",
+      "Nice try!",
+      "Haha, missed!",
+      "Getting warmer...",
+      "Was that supposed to work?",
+      "👀",
+      "Try harder!",
+    ];
+
+    function initGame1() {
+      phase = 1; p1Count = 0; p2Count = 0;
+      totalClicks = 0; totalMisses = 0;
+      startTime = Date.now();
+      isMoving = false;
+
+      const btn = document.getElementById('clickMeBtn');
+      btn.textContent = 'CLICK ME';
+      btn.style.cssText = '';
+      btn.style.left = '50%';
+      btn.style.top  = '50%';
+      btn.style.transform = 'translate(-50%,-50%)';
+      btn.classList.remove('phase2');
+
+      document.getElementById('g1Win').classList.remove('show');
+      document.getElementById('g1Taunt').classList.remove('show');
+      document.getElementById('g1Phase').textContent = '// phase 1 of 3';
+
+      buildDots(PHASE1_CLICKS, 0);
+
+      // Track misses (clicking the overlay but not the button)
+      const game1El = document.getElementById('game1');
+      game1El.onclick = function(e) {
+        if (e.target !== btn && e.target.id !== 'game1') return;
+        if (e.target.id === 'game1') totalMisses++;
+      };
+
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {}, 1000);
+    }
+
+    function buildDots(total, filled) {
+      const container = document.getElementById('g1Dots');
+      container.innerHTML = '';
+      for (let i = 0; i < total; i++) {
+        const d = document.createElement('div');
+        d.className = 'g1-dot' + (i < filled ? ' filled' : '');
+        container.appendChild(d);
+      }
+    }
+
+    function showTaunt(msg) {
+      const t = document.getElementById('g1Taunt');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1400);
+    }
+
+    function moveButtonRandom() {
+      const btn = document.getElementById('clickMeBtn');
+      const game1El = document.getElementById('game1');
+      const rect = game1El.getBoundingClientRect();
+      const bw = btn.offsetWidth  + 20;
+      const bh = btn.offsetHeight + 20;
+
+      const maxX = rect.width  - bw;
+      const maxY = rect.height - bh - 80;
+      const minY = 80;
+
+      const newX = Math.random() * maxX + bw / 2;
+      const newY = Math.random() * (maxY - minY) + minY;
+
+      btn.style.transition = 'left 0.15s ease, top 0.15s ease, transform 0.15s ease';
+      btn.style.left  = newX + 'px';
+      btn.style.top   = newY + 'px';
+      btn.style.transform = 'translate(-50%,-50%)';
+    }
+
+    // Main button click handler
+    document.getElementById('clickMeBtn').addEventListener('click', function(e) {
+      e.stopPropagation();
+      totalClicks++;
+
+      if (phase === 1) {
+        p1Count++;
+        buildDots(PHASE1_CLICKS, p1Count);
+        showTaunt(TAUNTS_P1[p1Count - 1] || "...");
+
+        if (p1Count >= PHASE1_CLICKS) {
+          // Enter phase 2 — button starts running
+          setTimeout(() => enterPhase2(), 600);
+        }
+
+      } else if (phase === 2) {
+        // Button was clicked while running — count it
+        p2Count++;
+        buildDots(PHASE2_CLICKS, p2Count);
+
+        if (p2Count >= PHASE2_CLICKS) {
+          triggerWin();
+          return;
+        }
+        showTaunt(TAUNTS_P2[Math.floor(Math.random() * TAUNTS_P2.length)]);
+        // Move immediately after being caught
+        moveButtonRandom();
+      }
+    });
+
+    // Track misses in phase 2 — hovering triggers move
+    document.getElementById('clickMeBtn').addEventListener('mouseenter', function() {
+      if (phase === 2) {
+        totalMisses++;
+        showTaunt(TAUNTS_P2[Math.floor(Math.random() * TAUNTS_P2.length)]);
+        moveButtonRandom();
+      }
+    });
+
+    function enterPhase2() {
+      phase = 2;
+      p2Count = 0;
+      isMoving = true;
+      const btn = document.getElementById('clickMeBtn');
+      btn.textContent = 'CATCH ME! 😈';
+      btn.style.borderColor = 'var(--amber)';
+      btn.style.boxShadow = '0 0 30px rgba(255,179,0,0.3)';
+      btn.style.color = 'var(--amber)';
+
+      document.getElementById('g1Phase').textContent = '// phase 2 of 3 — catch me if you can!';
+      buildDots(PHASE2_CLICKS, 0);
+
+      // Move immediately
+      moveButtonRandom();
+
+      // Keep moving every 2.5s even if not hovered
+      startAutoMove();
+    }
+
+    let autoMoveInterval = null;
+    function startAutoMove() {
+      clearInterval(autoMoveInterval);
+      autoMoveInterval = setInterval(() => {
+        if (phase === 2) moveButtonRandom();
+        else clearInterval(autoMoveInterval);
+      }, 2500);
+    }
+
+    function triggerWin() {
+      phase = 3;
+      clearInterval(autoMoveInterval);
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
+
+      // Hide button
+      document.getElementById('clickMeBtn').style.display = 'none';
+      document.getElementById('g1Dots').style.display = 'none';
+      document.getElementById('g1Phase').style.display = 'none';
+      document.getElementById('g1Taunt').style.display = 'none';
+
+      // Show win
+      document.getElementById('statClicks').textContent = totalClicks;
+      document.getElementById('statMisses').textContent = totalMisses;
+      document.getElementById('statTime').textContent   = elapsed + 's';
+      document.getElementById('g1Win').classList.add('show');
+
+      // Confetti
+      spawnConfetti();
+    }
+
+    function spawnConfetti() {
+      const colors = ['#00ff88','#00e5ff','#ffb300','#ff3860','#b066ff','#ff6eb4'];
+      const overlay = document.getElementById('game1');
+      for (let i = 0; i < 80; i++) {
+        setTimeout(() => {
+          const p = document.createElement('div');
+          p.className = 'confetti-piece';
+          p.style.cssText = `
+            left: ${Math.random() * 100}%;
+            top: -10px;
+            background: ${colors[Math.floor(Math.random() * colors.length)]};
+            width: ${Math.random() * 10 + 4}px;
+            height: ${Math.random() * 10 + 4}px;
+            border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+            animation-duration: ${Math.random() * 2 + 2}s;
+            animation-delay: ${Math.random() * 0.5}s;
+          `;
+          overlay.appendChild(p);
+          setTimeout(() => p.remove(), 4000);
+        }, i * 30);
+      }
+    }
+
+    function restartGame1() {
+      const btn = document.getElementById('clickMeBtn');
+      btn.style.display = '';
+      document.getElementById('g1Dots').style.display = '';
+      document.getElementById('g1Phase').style.display = '';
+      document.getElementById('g1Taunt').style.display = '';
+      document.getElementById('g1Win').classList.remove('show');
+      initGame1();
+    }
+  </script>
+</body>
+</html>
