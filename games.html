@@ -262,20 +262,12 @@
     #gameOverlay.open { display: flex; }
 
     .game-close {
-    position: fixed;
-    top: 1.5rem;
-    right: 2rem;
-    z-index: 9999;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--muted);
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.4rem 0.8rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 2px; 
+      position: fixed; top: 1.5rem; right: 2rem;
+      z-index: 10000;
+      font-family: var(--font-mono); font-size: 0.8rem;
+      color: var(--muted); background: var(--panel); border: 1px solid var(--border);
+      border-radius: 6px; padding: 0.4rem 0.8rem;
+      cursor: pointer; transition: all 0.2s; letter-spacing: 2px;
     }
     .game-close:hover { color: var(--red); border-color: var(--red); }
 
@@ -327,6 +319,7 @@
       border-radius: 14px;
       border: 1px solid rgba(0,255,136,0.2);
       animation: pulse 2s ease-in-out infinite;
+      pointer-events: none;
     }
     @keyframes pulse {
       0%,100% { transform: scale(1); opacity: 0.5; }
@@ -426,12 +419,71 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     /* Responsive */
+    /* ═══════════════════
+       GAME 2 — SNAKE
+    ═══════════════════ */
+    #game2 {
+      width: 100%; height: 100%;
+      position: relative;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+    #game2.active { display: flex; }
+    #g2Header { display: flex; align-items: center; gap: 2.5rem; font-family: var(--font-mono); }
+    .g2-label { font-size: 0.6rem; color: var(--muted); letter-spacing: 2px; display: block; text-align: center; }
+    #g2ScoreBox, #g2HighBox { text-align: center; }
+    #g2Score, #g2High { font-family: var(--font-head); font-size: 1.6rem; color: var(--green); text-shadow: var(--glow-g); display: block; }
+    #g2High { color: var(--amber); text-shadow: 0 0 8px rgba(255,179,0,0.4); }
+    #g2StatusBox { font-size: 0.72rem; color: var(--cyan); letter-spacing: 1px; min-width: 220px; text-align: center; }
+    #g2Canvas {
+      background: #020c10;
+      border: 2px solid var(--green2);
+      border-radius: 8px;
+      box-shadow: 0 0 40px rgba(0,255,136,0.15), inset 0 0 30px rgba(0,0,0,0.6);
+      image-rendering: pixelated;
+      max-width: 90vw;
+      max-height: 50vh;
+    }
+    #g2Footer { font-family: var(--font-mono); font-size: 0.68rem; color: var(--muted); letter-spacing: 1px; text-align: center; }
+    #g2Over {
+      display: none;
+      position: absolute;
+      inset: 0;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2,8,12,0.92);
+      z-index: 10;
+      text-align: center;
+    }
+    #g2Over.show { display: flex; animation: fadeIn 0.3s; }
+    .g2-over-title {
+      font-family: var(--font-head);
+      font-size: clamp(1.4rem, 3.5vw, 2.2rem);
+      font-weight: 900;
+      color: var(--red);
+      letter-spacing: 3px;
+      text-shadow: 0 0 24px rgba(255,56,96,0.4);
+      margin-bottom: 0.5rem;
+      animation: glitchText 0.4s;
+    }
+    @keyframes glitchText {
+      0%, 100% { text-shadow: 2px 0 var(--cyan), -2px 0 var(--red); }
+      50%       { text-shadow: -2px 0 var(--cyan), 2px 0 var(--red); }
+    }
+    .g2-over-sub { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); letter-spacing: 2px; margin-bottom: 1.5rem; }
+    #g2FinalScore { font-family: var(--font-mono); font-size: 0.95rem; color: var(--green); margin-bottom: 2rem; letter-spacing: 1px; }
+
     @media (max-width: 768px) {
       nav { padding: 1rem 1.5rem; }
       .nav-links { gap: 1rem; }
       .nav-links a { font-size: 0.68rem; }
       body { cursor: auto; }
       #cursor, #cursor-dot { display: none; }
+      #g2Header { gap: 1.2rem; }
     }
     @media (max-width: 480px) {
       .games-grid { grid-template-columns: 1fr; }
@@ -482,20 +534,20 @@
         </div>
       </div>
 
-      <!-- Coming Soon cards -->
-      <div class="game-card coming-soon">
-        <div class="coming-badge">Coming Soon</div>
+      <!-- Game 2 — Snake -->
+      <div class="game-card">
         <div class="game-card-preview"><span class="preview-emoji">🐍</span></div>
         <div class="game-card-body">
           <div class="game-card-title">SNAKE — Terminal Edition</div>
           <p class="game-card-desc">Classic snake game but with a terminal hacker aesthetic. Eat the data packets, don't crash the server.</p>
           <div class="game-card-footer">
             <span class="game-difficulty diff-medium">// Medium</span>
-            <a class="btn-github" href="https://github.com/iansiosontech" target="_blank">🐙 GitHub</a>
+            <button class="btn-play" onclick="openGame('game2')">▶ Play</button>
           </div>
         </div>
       </div>
 
+      <!-- Coming Soon cards -->
       <div class="game-card coming-soon">
         <div class="coming-badge">Coming Soon</div>
         <div class="game-card-preview"><span class="preview-emoji">🧠</span></div>
@@ -605,6 +657,34 @@
       </div>
     </div>
 
+    <!-- ── GAME 2 ── -->
+    <div id="game2">
+      <div id="g2Header">
+        <div id="g2ScoreBox">
+          <span class="g2-label">SCORE</span>
+          <span id="g2Score">0</span>
+        </div>
+        <div id="g2StatusBox">
+          <span id="g2Status">// press any arrow key to start</span>
+        </div>
+        <div id="g2HighBox">
+          <span class="g2-label">BEST</span>
+          <span id="g2High">0</span>
+        </div>
+      </div>
+
+      <canvas id="g2Canvas" width="400" height="400"></canvas>
+
+      <div id="g2Footer">use arrow keys or WASD &nbsp;|&nbsp; eat packets, don't crash the server</div>
+
+      <div id="g2Over">
+        <div class="g2-over-title">SERVER CRASHED</div>
+        <div class="g2-over-sub">// connection terminated</div>
+        <div id="g2FinalScore">Packets eaten: 0</div>
+        <button class="btn-restart" onclick="restartGame2()">↺ Reconnect</button>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -628,10 +708,12 @@
       document.querySelectorAll('[id^="game"]').forEach(g => g.classList.remove('active'));
       document.getElementById(id).classList.add('active');
       if (id === 'game1') initGame1();
+      if (id === 'game2') initGame2();
     }
     function closeGame() {
       document.getElementById('gameOverlay').classList.remove('open');
       clearInterval(timerInterval);
+      clearInterval(g2loop);
     }
 
     /* ══════════════════════════════════════
@@ -856,6 +938,166 @@
       document.getElementById('g1Win').classList.remove('show');
       initGame1();
     }
+
+    /* ══════════════════════════════════════
+       GAME 2 — SNAKE TERMINAL EDITION
+    ══════════════════════════════════════ */
+    const G2_GRID = 20;
+    const G2_CELL = 20;
+    const G2_SPEED_START = 140;
+    const G2_SPEED_MIN   = 70;
+
+    let g2canvas, g2ctx;
+    let g2snake, g2dir, g2nextDir, g2food, g2score, g2high, g2speed;
+    let g2loop = null;
+    let g2running = false;
+    let g2started = false;
+
+    function initGame2() {
+      g2canvas = document.getElementById('g2Canvas');
+      g2ctx = g2canvas.getContext('2d');
+      g2high = parseInt(localStorage.getItem('kis_snake_high') || '0', 10) || 0;
+      document.getElementById('g2High').textContent = g2high;
+      resetGame2();
+      drawGame2();
+    }
+
+    function resetGame2() {
+      g2snake = [
+        { x: 10, y: 10 },
+        { x: 9,  y: 10 },
+        { x: 8,  y: 10 },
+      ];
+      g2dir = { x: 1, y: 0 };
+      g2nextDir = { x: 1, y: 0 };
+      g2food = spawnFood2();
+      g2score = 0;
+      g2speed = G2_SPEED_START;
+      g2started = false;
+      g2running = false;
+      document.getElementById('g2Score').textContent = '0';
+      document.getElementById('g2Status').textContent = '// press any arrow key to start';
+      document.getElementById('g2Over').classList.remove('show');
+      clearInterval(g2loop);
+    }
+
+    function spawnFood2() {
+      let pos;
+      do {
+        pos = {
+          x: Math.floor(Math.random() * G2_GRID),
+          y: Math.floor(Math.random() * G2_GRID),
+        };
+      } while (g2snake && g2snake.some(s => s.x === pos.x && s.y === pos.y));
+      return pos;
+    }
+
+    function startGame2() {
+      if (g2running) return;
+      g2running = true;
+      g2started = true;
+      document.getElementById('g2Status').textContent = '// connection active';
+      g2loop = setInterval(tickGame2, g2speed);
+    }
+
+    function tickGame2() {
+      g2dir = g2nextDir;
+      const head = { x: g2snake[0].x + g2dir.x, y: g2snake[0].y + g2dir.y };
+
+      if (head.x < 0 || head.x >= G2_GRID || head.y < 0 || head.y >= G2_GRID) {
+        return gameOver2();
+      }
+      if (g2snake.some(s => s.x === head.x && s.y === head.y)) {
+        return gameOver2();
+      }
+
+      g2snake.unshift(head);
+
+      if (head.x === g2food.x && head.y === g2food.y) {
+        g2score++;
+        document.getElementById('g2Score').textContent = g2score;
+        g2food = spawnFood2();
+
+        if (g2score % 5 === 0 && g2speed > G2_SPEED_MIN) {
+          g2speed -= 8;
+          clearInterval(g2loop);
+          g2loop = setInterval(tickGame2, g2speed);
+        }
+      } else {
+        g2snake.pop();
+      }
+
+      drawGame2();
+    }
+
+    function drawGame2() {
+      const ctx = g2ctx;
+      ctx.clearRect(0, 0, g2canvas.width, g2canvas.height);
+
+      ctx.fillStyle = 'rgba(0,255,136,0.03)';
+      for (let x = 0; x < G2_GRID; x++) {
+        for (let y = 0; y < G2_GRID; y++) {
+          if ((x + y) % 2 === 0) {
+            ctx.fillRect(x * G2_CELL, y * G2_CELL, G2_CELL, G2_CELL);
+          }
+        }
+      }
+
+      ctx.fillStyle = '#ffb300';
+      ctx.shadowColor = '#ffb300';
+      ctx.shadowBlur = 10;
+      ctx.fillRect(g2food.x * G2_CELL + 3, g2food.y * G2_CELL + 3, G2_CELL - 6, G2_CELL - 6);
+      ctx.shadowBlur = 0;
+
+      g2snake.forEach((seg, i) => {
+        const isHead = i === 0;
+        ctx.fillStyle = isHead ? '#00ff88' : '#00cc66';
+        ctx.shadowColor = '#00ff88';
+        ctx.shadowBlur = isHead ? 12 : 4;
+        const pad = isHead ? 1 : 2;
+        ctx.fillRect(seg.x * G2_CELL + pad, seg.y * G2_CELL + pad, G2_CELL - pad * 2, G2_CELL - pad * 2);
+      });
+      ctx.shadowBlur = 0;
+    }
+
+    function gameOver2() {
+      clearInterval(g2loop);
+      g2running = false;
+
+      if (g2score > g2high) {
+        g2high = g2score;
+        localStorage.setItem('kis_snake_high', g2high);
+        document.getElementById('g2High').textContent = g2high;
+      }
+
+      document.getElementById('g2FinalScore').textContent = `Packets eaten: ${g2score}`;
+      document.getElementById('g2Over').classList.add('show');
+    }
+
+    function restartGame2() {
+      resetGame2();
+      drawGame2();
+    }
+
+    document.addEventListener('keydown', e => {
+      const game2El = document.getElementById('game2');
+      if (!game2El || !game2El.classList.contains('active')) return;
+
+      const key = e.key.toLowerCase();
+      let newDir = null;
+
+      if (key === 'arrowup'    || key === 'w') newDir = { x: 0, y: -1 };
+      if (key === 'arrowdown'  || key === 's') newDir = { x: 0, y: 1 };
+      if (key === 'arrowleft'  || key === 'a') newDir = { x: -1, y: 0 };
+      if (key === 'arrowright' || key === 'd') newDir = { x: 1, y: 0 };
+
+      if (newDir) {
+        e.preventDefault();
+        if (g2dir.x === -newDir.x && g2dir.y === -newDir.y && g2snake.length > 1) return;
+        g2nextDir = newDir;
+        if (!g2started) startGame2();
+      }
+    });
   </script>
 </body>
 </html>
