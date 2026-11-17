@@ -48,7 +48,13 @@
       icon:  '📊',
       title: 'Visual-Qwen',
       desc:  'Augmenting Multimodal Deep Learning with Attention Mechanisms to Recognize "Sludge" Videos from Short-Form Content.',
-      stack: ['Python'],
+      highlights: [
+        '$376K of compute granted by Google TPU Research Cloud & the YouTube Research Program',
+        '6,000-row multimodal dataset with 200+ monthly downloads on Kaggle',
+        '2,000+ short-form videos gathered and annotated',
+        'Validated by 53 ML experts, content creators, moderators & data scientists',
+      ],
+      stack: ['Python', 'Multimodal AI', 'Google TPU'],
       repo:  'https://github.com/alpharomercoma/vqwen-qformer',
       demo:  'https://micromarc.vercel.app/#home',
     },
@@ -56,8 +62,13 @@
       file:  'jobtracker-ai.md',
       icon:  '🤖',
       title: 'JobTracker AI',
-      desc:  'AI-powered job application tracker with a Kanban board, resume analysis, job description matching, and AI cover letter generation — powered by Google Gemini. BYOK (bring your own key), so it is free and auth-free for anyone to use.',
-      stack: ['FastAPI', 'PostgreSQL', 'Next.js', 'Gemini AI'],
+      desc:  'Full-stack AI platform for job hunting, deployed to production. BYOK (bring your own key), so it is free and auth-free for anyone to use.',
+      highlights: [
+        'Scores resumes against jobs, analyzes skill gaps, writes tailored cover letters (Gemini)',
+        'Automated job-posting scraping (httpx, BeautifulSoup) + drag-and-drop Kanban',
+        'Deployed on Vercel + Render with Dockerized PostgreSQL',
+      ],
+      stack: ['FastAPI', 'PostgreSQL', 'Next.js', 'TypeScript', 'Gemini AI', 'Docker'],
       repo:  'https://github.com/iansiosontech/Job-Application-Tracker',
       demo:  'https://kits-jobtracker.vercel.app',
     },
@@ -137,6 +148,7 @@
       content: () => [
         `<span class="term-info"># ${p.icon} ${esc(p.title)}</span>`,
         esc(p.desc),
+        ...(p.highlights || []).map(h => `&nbsp;&nbsp;▹ ${esc(h)}`),
         `<span class="term-success">stack</span> : ${p.stack.map(esc).join(', ')}`,
         `<span class="term-success">repo</span>  : ${link(p.repo)}`,
         `<span class="term-success">demo</span>  : ${link(p.demo)}`,
@@ -253,6 +265,7 @@
     ['neofetch', 'System info, portfolio style'],
     ['skills',   'Tech stack &amp; tools'],
     ['projects', 'Notable projects'],
+    ['experience', 'Where I have worked'],
     ['ls',       'List files (try <span class="term-success">ls projects</span>)'],
     ['cd',       'Change directory'],
     ['cat',      'Read a file (try <span class="term-success">cat about.txt</span>)'],
@@ -272,7 +285,7 @@
     help: () => [
       '<span class="term-info">Available commands:</span>',
       ...HELP.map(([c, d]) =>
-        `&nbsp;&nbsp;<span class="term-success">${c.padEnd(9, ' ').replace(/ /g, '&nbsp;')}</span>— ${d}`
+        `&nbsp;&nbsp;<span class="term-success">${c.padEnd(11, ' ').replace(/ /g, '&nbsp;')}</span>— ${d}`
       ),
       '<span class="term-comment">// Tab autocompletes · ↑/↓ browse history · some commands are hidden 👀</span>',
     ],
@@ -302,7 +315,7 @@
         '<span class="term-comment">-------------------</span>',
         `<span class="term-info">User</span>: ${esc(PROFILE.name)}`,
         `<span class="term-info">Role</span>: ${esc(PROFILE.role)}`,
-        `<span class="term-info">Host</span>: ${esc(PROFILE.school)}`,
+        `<span class="term-info">Host</span>: ${esc(PROFILE.school)} · NSYSU Taiwan`,
         '<span class="term-info">Exp</span>: Software Developer @ ServiceBai Philippines',
         `<span class="term-info">Uptime</span>: ${years}+ yrs of CS (since ${PROFILE.studentSince})`,
         `<span class="term-info">Projects</span>: ${PROJECTS.map(p => esc(p.title)).join(', ')}`,
@@ -322,6 +335,14 @@
       '<span class="term-success">── Backend</span>&nbsp;&nbsp;&nbsp;&nbsp; Node.js  FastAPI  GraphQL  REST',
       '<span class="term-success">── Databases</span>&nbsp;&nbsp; MongoDB  PostgreSQL  Redis  Firebase',
       '<span class="term-success">── DevOps</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Docker  AWS  Git  Linux  CI/CD',
+    ],
+
+    experience: () => [
+      '<span class="term-info">$ cat experience.log</span>',
+      '<span class="term-success">2026</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Software Developer @ ServiceBai Philippines',
+      '<span class="term-success">2025–now</span>&nbsp;&nbsp;&nbsp;Freelance Developer @ Independent clients',
+      '<span class="term-success">2022–2024</span>&nbsp;&nbsp;Junior Officer @ ACM',
+      '<span class="term-comment">// Scroll to "Where I\'ve Worked" for details</span>',
     ],
 
     projects: () => [
