@@ -41,4 +41,4 @@ To change what the terminal says, edit `PROFILE` and `PROJECTS` at the top of `j
 
 ## Contact
 
-ianzsioson@gmail.com · [LinkedIn](https://linkedin.com/in/kristoffer-ian-sioson) · [GitHub](https://github.com/iansiosontech)
+ianzsioszon@gmail.com · [LinkedIn](https://linkedin.com/in/kristoffer-ian-sioson) · [GitHub](https://github.com/iansiosontech)

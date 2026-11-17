@@ -35,7 +35,7 @@
 
   /* ── Mail handler ────────────────────────────────── */
   function mailtoHandler({ name, email, subject, message }) {
-    const to   = 'ianzsioson@gmail.com';
+    const to   = 'ianzsioszon@gmail.com';
     const body = [
       `Name:    ${name}`,
       `Email:   ${email}`,
@@ -80,7 +80,7 @@
         );
         form.reset();
       } catch (err) {
-        showStatus('error', '✕ Something went wrong. Please email me directly at ianzsioson@gmail.com');
+        showStatus('error', '✕ Something went wrong. Please email me directly at ianzsioszon@gmail.com');
         console.error('[contact.js]', err);
       } finally {
         sendBtn.textContent = '⚡ Send Message';

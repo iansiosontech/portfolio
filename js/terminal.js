@@ -32,7 +32,7 @@
     school:   'FEU Institute of Technology',
     degree:   'BS Computer Science (Software Engineering)',
     studentSince: 2022,
-    email:    'ianzsioson@gmail.com',
+    email:    'ianzsioszon@gmail.com',
     resume:   'assets/Sioson_Resume.pdf',
     links: {
       github:    'https://github.com/iansiosontech',
