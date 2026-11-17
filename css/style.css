@@ -602,6 +602,46 @@ section { position: relative; z-index: 1; }
 .term-info        { color: var(--color-amber); }
 
 /* Active input row */
+.term-link        { color: var(--color-cyan); text-decoration: underline; text-underline-offset: 2px; }
+.term-link:hover  { color: var(--color-white); }
+.neo-art          { display: inline-block; width: 9ch; color: var(--color-green); white-space: pre; vertical-align: top; }
+.neo-info         { word-break: normal; overflow-wrap: break-word; }
+@media (max-width: 768px) {
+  .neo-art { display: none; }
+}
+
+/* Quick-command chips under the computer */
+.term-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+.term-chips-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+.term-chip {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--color-green);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+.term-chip:hover,
+.term-chip:focus-visible {
+  border-color: var(--color-green);
+  background: rgba(0, 255, 136, 0.08);
+  outline: none;
+}
+
 .term-input-line  { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
 .term-input-display { color: var(--color-green); word-break: break-all; }
 .term-cursor-blink {
