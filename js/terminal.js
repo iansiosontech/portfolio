@@ -295,7 +295,7 @@
         ' |&lt;   ',
         ' | \\  ',
         ' |  \\ ',
-        '', '', '', '', '',
+        '', '', '', '', '', '',
       ];
       const info = [
         '<span class="term-info">visitor</span>@<span class="term-info">kristoffer-os</span>',
@@ -303,6 +303,7 @@
         `<span class="term-info">User</span>: ${esc(PROFILE.name)}`,
         `<span class="term-info">Role</span>: ${esc(PROFILE.role)}`,
         `<span class="term-info">Host</span>: ${esc(PROFILE.school)}`,
+        '<span class="term-info">Exp</span>: Software Developer @ ServiceBai Philippines',
         `<span class="term-info">Uptime</span>: ${years}+ yrs of CS (since ${PROFILE.studentSince})`,
         `<span class="term-info">Projects</span>: ${PROJECTS.map(p => esc(p.title)).join(', ')}`,
         '<span class="term-info">Stack</span>: Python, TypeScript, React, FastAPI',

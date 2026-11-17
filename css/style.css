@@ -1174,3 +1174,24 @@ footer {
   .projects-grid { grid-template-columns: 1fr; }
   .certs-grid    { grid-template-columns: 1fr; }
 }
+
+/* Experience bullet points */
+.exp-points {
+  list-style: none;
+  margin-top: 0.4rem;
+  font-size: 0.87rem;
+  color: var(--color-muted);
+  line-height: 1.65;
+}
+.exp-points li {
+  position: relative;
+  padding-left: 1.2rem;
+  margin-bottom: 0.45rem;
+}
+.exp-points li::before {
+  content: '▹';
+  position: absolute;
+  left: 0;
+  color: var(--color-green);
+}
+.exp-tags { margin-top: 0.8rem; margin-bottom: 0; }
