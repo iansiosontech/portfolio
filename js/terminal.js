@@ -44,6 +44,20 @@
 
   const PROJECTS = [
     {
+      file:  'kuwento-quest.md',
+      icon:  '📖',
+      title: 'Kuwento Quest',
+      desc:  'Client project: a gamified story for students following Danding through his life, with a bit of Philippine history along the way.',
+      highlights: [
+        'Story player with synced narration & captions, plus a caption timing tool',
+        'Question flow, result card & results screen; leaderboard saved to Supabase',
+        'Facilitator dashboard and a phone-first layout',
+      ],
+      stack: ['Next.js 14', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Supabase', 'Web Audio API'],
+      repo:  'https://github.com/iansiosontech/kultura',
+      demo:  'https://kuwentoquest.vercel.app/',
+    },
+    {
       file:  'visual-qwen.md',
       icon:  '📊',
       title: 'Visual-Qwen',
@@ -339,7 +353,6 @@
 
     experience: () => [
       '<span class="term-info">$ cat experience.log</span>',
-      '<span class="term-success">2026–now</span>&nbsp;&nbsp;&nbsp;Developer @ Kuwento Quest (client project)',
       '<span class="term-success">2026</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Software Developer @ ServiceBai Philippines',
       '<span class="term-success">2025–now</span>&nbsp;&nbsp;&nbsp;Freelance Developer @ Independent clients',
       '<span class="term-success">2022–2024</span>&nbsp;&nbsp;Junior Officer @ ACM',
@@ -450,7 +463,6 @@
         instagram:{ url: PROFILE.links.instagram },
         facebook: { url: PROFILE.links.facebook },
       };
-      shortcuts['kuwento-quest'] = { url: 'https://kuwentoquest.vercel.app/', label: 'Kuwento Quest (live demo)' };
       PROJECTS.forEach(p => {
         shortcuts[p.file.replace(/\.md$/, '')] = { url: p.demo, label: p.title + ' (live demo)' };
       });
