@@ -2,13 +2,13 @@
 
 Personal portfolio with a terminal you can actually use.
 
-**Live:** https://iansiosontech.github.io/portfolio/
+**Live:** https://kristofferian.vercel.app
 
 ## Highlights
 
 - **KristofferOS terminal.** Click the computer in the hero and type. Try `help`, `neofetch`, `ls projects`, `cat projects/jobtracker-ai.md`, `open resume` or `sudo hire-me`. Tab completes commands and file names, and ↑/↓ browse history. On a phone, tap the command chips under the screen.
 - **Fun zone** (`games.html`): small browser games built from scratch, including a button that runs away from you and a terminal-themed Snake.
-- **No framework, no build step.** Plain HTML, CSS and JavaScript, hosted on GitHub Pages.
+- **No framework, no build step.** Plain HTML, CSS and JavaScript, deployed on Vercel (every merge to `main` goes live).
 
 ## Projects featured
 
