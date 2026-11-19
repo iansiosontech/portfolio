@@ -339,6 +339,7 @@
 
     experience: () => [
       '<span class="term-info">$ cat experience.log</span>',
+      '<span class="term-success">2026–now</span>&nbsp;&nbsp;&nbsp;Developer @ Kuwento Quest (client project)',
       '<span class="term-success">2026</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Software Developer @ ServiceBai Philippines',
       '<span class="term-success">2025–now</span>&nbsp;&nbsp;&nbsp;Freelance Developer @ Independent clients',
       '<span class="term-success">2022–2024</span>&nbsp;&nbsp;Junior Officer @ ACM',
@@ -449,6 +450,7 @@
         instagram:{ url: PROFILE.links.instagram },
         facebook: { url: PROFILE.links.facebook },
       };
+      shortcuts['kuwento-quest'] = { url: 'https://kuwentoquest.vercel.app/', label: 'Kuwento Quest (live demo)' };
       PROJECTS.forEach(p => {
         shortcuts[p.file.replace(/\.md$/, '')] = { url: p.demo, label: p.title + ' (live demo)' };
       });
